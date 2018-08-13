@@ -5,13 +5,12 @@ import marquez.api.Job;
 import org.jdbi.v3.core.Handle;
 import org.jdbi.v3.sqlobject.CreateSqlObject;
 import org.jdbi.v3.sqlobject.SqlObject;
-import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
 import org.jdbi.v3.sqlobject.customizer.Bind;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-//@RegisterRowMapper(JobRow.class)
+// @RegisterRowMapper(JobRow.class)
 public interface JobDAO extends SqlObject {
   static final Logger LOG = LoggerFactory.getLogger(JobDAO.class);
 
@@ -22,13 +21,22 @@ public interface JobDAO extends SqlObject {
     try (final Handle handle = getHandle()) {
       handle.useTransaction(
           h -> {
-            h.createUpdate(
-                    "INSERT INTO jobs (name, nominal_time, category, description)"
-                        + " VALUES (:name, :nominalTime, :category, :description)")
-                .bindBean(job)
+            int jobId =
+                h.createUpdate(
+                        "INSERT INTO jobs (name, nominal_time, category, description)"
+                            + " VALUES (:name, :nominalTime, :category, :description)")
+                    .bindBean(job)
+                    .executeAndReturnGeneratedKeys()
+                    .mapTo(int.class)
+                    .findOnly();
+            int ownershipId = createOwnershipDAO().insert(job.getName(), job.getOwnerName());
+            LOG.info("The job that was created id is: " + jobId);
+            LOG.info("The ownership Id that was created id is: " + ownershipId);
+
+            h.createUpdate("UPDATE jobs SET current_ownership = :ownershipId WHERE id = :jobId")
+                .bind("ownershipId", ownershipId)
+                .bind("jobId", jobId)
                 .execute();
-            createOwnershipDAO().insert(job.getName(), job.getOwnerName());
-            h.commit();
           });
     } catch (Exception e) {
       // TODO: Add better error handling
