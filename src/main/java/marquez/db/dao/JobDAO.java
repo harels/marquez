@@ -49,4 +49,25 @@ public interface JobDAO extends SqlObject {
 
   @SqlQuery("SELECT * FROM jobs LIMIT :limit")
   List<Job> findAll(@Bind("limit") int limit);
+
+  default void updateOwnership(@Bind("ownerName") String ownerName, String jobName) {
+      try (final Handle handle = getHandle()) {
+          handle.useTransaction(
+                  h -> {
+
+                      //int jobId = findByName(jobName).getId();
+                      int jobId = h.createQuery("SELECT id from jobs where name = :jobName").bind("jobName", jobName).mapTo(int.class).findOnly();
+                      int ownershipId = createOwnershipDAO().insert(jobName, ownerName);
+                      h.createUpdate("UPDATE jobs SET current_ownership = :ownershipId WHERE id = :jobId")
+                              .bind("ownershipId", ownershipId)
+                              .bind("jobId", jobId)
+                              .execute();
+
+                  });
+      } catch (Exception e) {
+          // TODO: Add better error handling
+          LOG.error(e.getMessage());
+      }
+  }
+
 }

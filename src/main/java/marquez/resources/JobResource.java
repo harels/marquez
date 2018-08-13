@@ -13,8 +13,12 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 import marquez.api.Job;
 import marquez.db.dao.JobDAO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Path("/jobs")
 @Produces(APPLICATION_JSON)
@@ -22,6 +26,8 @@ public final class JobResource extends BaseResource {
   private static final String DEFAULT_LIMIT = "25";
 
   private final JobDAO dao;
+
+  private static final Logger LOG = LoggerFactory.getLogger(JobDAO.class);
 
   public JobResource(final JobDAO dao) {
     this.dao = dao;
@@ -52,7 +58,10 @@ public final class JobResource extends BaseResource {
   @Path("/{name}")
   @Consumes(APPLICATION_JSON)
   @Timed
-  public Response update(@PathParam("name") final String jobName) {
-    return Response.ok().build();
+  public Response update(@PathParam("name") String jobName, final Job job) {
+    String newOwnerName = job.getOwnerName();
+    LOG.info("Updating owner for job " + jobName + " to be " + newOwnerName);
+    dao.updateOwnership(newOwnerName, jobName);
+    return Response.ok() .build();
   }
 }
