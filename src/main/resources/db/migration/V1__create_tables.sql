@@ -11,6 +11,7 @@ CREATE TABLE jobs (
   updated_at        TIMESTAMP,
   current_version   INTEGER,
   current_ownership INTEGER,
+  state             VARCHAR(64),
   nominal_time      TIMESTAMP,
   category          VARCHAR(64),
   description       TEXT NOT NULL

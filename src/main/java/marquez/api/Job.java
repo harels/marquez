@@ -11,6 +11,7 @@ public final class Job {
   private final int id;
   private final String name;
   private final String ownerName;
+  private final String state;
   private final Timestamp nominalTime;
   private final String category;
   private final String description;
@@ -20,12 +21,14 @@ public final class Job {
       @JsonProperty("id") final int id,
       @JsonProperty("name") @NotBlank final String name,
       @JsonProperty("ownerName") final String ownerName,
+      @JsonProperty("state") final String state,
       @JsonProperty("nominalTime") final Timestamp nominalTime,
       @JsonProperty("category") final String category,
       @JsonProperty("description") final String description) {
     this.id = id;
     this.name = name;
     this.ownerName = ownerName;
+    this.state = state;
     this.nominalTime = nominalTime;
     this.category = category;
     this.description = description;
@@ -42,6 +45,10 @@ public final class Job {
 
   public String getOwnerName() {
     return ownerName;
+  }
+
+  public String getState() {
+    return state;
   }
 
   public Timestamp getNominalTime() {

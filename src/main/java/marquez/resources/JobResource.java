@@ -57,9 +57,8 @@ public final class JobResource extends BaseResource {
   @Consumes(APPLICATION_JSON)
   @Timed
   public Response update(@PathParam("name") String jobName, final Job job) {
-    String newOwnerName = job.getOwnerName();
-    LOG.info("Updating owner for job " + jobName + " to be " + newOwnerName);
-    dao.updateOwnership(newOwnerName, jobName);
+    LOG.info(job.toString());
+    dao.update(job, jobName);
     return Response.ok().build();
   }
 }
