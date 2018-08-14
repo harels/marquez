@@ -13,8 +13,6 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
 import marquez.api.Job;
 import marquez.db.dao.JobDAO;
 import org.slf4j.Logger;
@@ -62,6 +60,6 @@ public final class JobResource extends BaseResource {
     String newOwnerName = job.getOwnerName();
     LOG.info("Updating owner for job " + jobName + " to be " + newOwnerName);
     dao.updateOwnership(newOwnerName, jobName);
-    return Response.ok() .build();
+    return Response.ok().build();
   }
 }

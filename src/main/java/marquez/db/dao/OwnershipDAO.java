@@ -17,4 +17,7 @@ public interface OwnershipDAO {
           + ")")
   @GetGeneratedKeys
   int insert(@Bind("jobName") String jobName, @Bind("ownerName") String ownerName);
+
+  @SqlUpdate("UPDATE ownerships SET endeded_at = NOW() WHERE job_id = (SELECT id FROM jobs WHERE name = :jobName)") 
+  int endOwnership(@Bind("jobName") String jobName);
 }
